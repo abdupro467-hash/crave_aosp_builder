@@ -538,7 +538,7 @@ jobs:
 
         # Build the ROM
         $LUNCH && \
-        # Add private signing keys (للروم يبقى signed)
+        # Add private signing keys
         git clone https://github.com/abdupro467-hash/vendor_lineage-priv_keys.git -b lineage-23.0 vendor/lineage-priv/keys || true && \
         echo '-include vendor/lineage-priv/keys/keys.mk' >> device/xiaomi/blossom/lineage_blossom.mk || true && \
         make installclean && \
