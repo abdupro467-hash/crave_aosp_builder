@@ -538,9 +538,12 @@ jobs:
 
         # Build the ROM
         $LUNCH && \
+                $LUNCH && \
+        # Add private signing keys for signed ROM
+        git clone https://github.com/abdupro467-hash/vendor_lineage-priv_keys.git -b lineage-23.0 vendor/lineage-priv/keys || true && \
+        echo '-include vendor/lineage-priv/keys/keys.mk' >> device/xiaomi/blossom/lineage_blossom.mk || true && \
         make installclean && \
-        ${{ github.event.inputs.BUILD_COMMAND }}"
-      timeout-minutes: 1440
+        mka bacon -j$(nproc --all)"
 
       # Send Build 'status' notification (Success)
     - name: Telegram Notification
