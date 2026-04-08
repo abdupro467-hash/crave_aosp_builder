@@ -1,0 +1,45 @@
+name: Build LineageOS 23 for Blossom
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y bc bison build-essential ccache curl flex git git-lfs gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev libelf-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.1-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3
+
+      - name: Clone signing keys
+        run: git clone https://github.com/abdupro467-hash/vendor_lineage-priv_keys.git -b lineage-23.0 vendor/lineage-priv/keys || true
+
+      - name: Clone local manifest
+        run: |
+          mkdir -p .repo/local_manifests
+          curl -L -o .repo/local_manifests/roomservice.xml https://raw.githubusercontent.com/abdupro467-hash/local_manifests_blossom/main/roomservice.xml
+
+      - name: Init & Sync source
+        run: |
+          repo init -u https://github.com/LineageOS/android.git -b lineage-23.0 --git-lfs --depth=1
+          repo sync -c -j4 --force-sync --no-clone-bundle --no-tags -q || echo "Sync done"
+
+      - name: Build
+        run: |
+          source build/envsetup.sh
+          breakfast blossom userdebug
+          echo '-include vendor/lineage-priv/keys/keys.mk' >> device/xiaomi/blossom/lineage_blossom.mk || true
+          mka bacon -j4
+        continue-on-error: true
+
+      - name: Upload ROM
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LineageOS-23-blossom
+          path: out/target/product/blossom/*.zip
