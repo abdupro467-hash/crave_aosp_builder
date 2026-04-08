@@ -42,7 +42,11 @@ jobs:
 
       - name: Initialize source
         run: |
-          repo init -u https://github.com/LineageOS/android.git -b lineage-23.0 --git-lfs --depth=1
+          # Install latest repo tool that supports --git-lfs
+          curl -s https://storage.googleapis.com/git-repo-downloads/repo > /usr/local/bin/repo
+          chmod a+x /usr/local/bin/repo
+
+          repo init -u https://github.com/LineageOS/android.git -b lineage-23.0 --depth=1 --no-clone-bundle
           repo sync -c -j2 --force-sync --no-clone-bundle --no-tags -q || echo "Sync completed with warnings"
 
       - name: Build ROM
