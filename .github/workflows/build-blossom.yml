@@ -27,14 +27,14 @@ jobs:
       - name: Init & Sync source
         run: |
           repo init -u https://github.com/LineageOS/android.git -b lineage-23.0 --git-lfs --depth=1
-          repo sync -c -j4 --force-sync --no-clone-bundle --no-tags -q || echo "Sync done"
+          repo sync -c -j2 --force-sync --no-clone-bundle --no-tags -q || echo "Sync done"
 
       - name: Build
         run: |
           source build/envsetup.sh
           breakfast blossom userdebug
           echo '-include vendor/lineage-priv/keys/keys.mk' >> device/xiaomi/blossom/lineage_blossom.mk || true
-          mka bacon -j4
+          mka bacon -j2
         continue-on-error: true
 
       - name: Upload ROM
